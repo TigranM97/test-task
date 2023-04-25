@@ -5,13 +5,16 @@ import { FriendsService } from '../friends/friends.service';
 import { Repository } from 'typeorm';
 import { FriendRequest } from './friendRequest.entity';
 import { FriendRequestDTO } from './dto/frieend-request.dto';
+import { UsersService } from 'src/users/users.service';
+import { UsersDTO } from 'src/users/dto/users.dto';
 
 @Injectable()
 export class FriendRequestService {
     constructor(
         @InjectRepository(FriendRequest)
         private friendRequestRepository: Repository<FriendRequest>,
-        private friendsService: FriendsService
+        private friendsService: FriendsService,
+        private usersService: UsersService
     ) { }
 
     async sendFriendRequest(userFromId: number, userToId: number): Promise<FriendRequestDTO> {
@@ -50,5 +53,13 @@ export class FriendRequestService {
         if (!friendRequest) {
             throw new HttpException('request not found', HttpStatus.BAD_REQUEST);
         }
+    }
+
+    async showFriendRequestList(userId): Promise<UsersDTO[]>{
+        const requests = await this.friendRequestRepository.find({where: {userToId: userId}})
+        const ids = requests.map(el => {
+            return el.userFromId
+        })
+        return this.usersService.findUserWithIds(ids)
     }
 }

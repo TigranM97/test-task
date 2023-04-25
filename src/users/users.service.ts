@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
+import { ILike, In, Repository } from 'typeorm';
 import { AuthRegister } from './input/authRegistr';
 import { Users } from './users.entity';
 import * as bcrypt from 'bcrypt';
@@ -23,7 +23,7 @@ export class UsersService {
     }
   }
 
-  async searchByName(search): Promise<UsersDTO[]> {
+  searchByName(search): Promise<UsersDTO[]> {
     return this.userRepository.find({
       where: [
         { firstName: search?.firstName },
@@ -34,10 +34,14 @@ export class UsersService {
 
   }
 
-  async searchUser({ name }): Promise<UsersDTO[]> {
+  searchUser({ name }): Promise<UsersDTO[]> {
     return this.userRepository.find({
       where:
       { firstName: ILike(`%${name}%`) },
     });
+  }
+
+  findUserWithIds(ids: number[]): Promise<UsersDTO[]>{
+    return this.userRepository.find({where: {id: In(ids)}})
   }
 }
