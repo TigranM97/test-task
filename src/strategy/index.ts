@@ -1,0 +1,17 @@
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { PassportStrategy } from '@nestjs/passport';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+
+
+export class JwtStrategy extends PassportStrategy(Strategy) {
+  constructor() {
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      secretOrKey: 'VeryHardSecret',
+    });
+  }
+
+  async validate(payload: any) {
+    return { ...payload };
+  }
+}
